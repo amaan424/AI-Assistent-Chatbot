@@ -1,0 +1,14 @@
+streamlit
+langchain
+langchain-community
+langchain-google-genai
+langchain-text-splitters
+faiss-cpu
+sentence-transformers
+apscheduler
+python-dotenv
+google-generativeai
+Pillow
+pyvis
+langdetect
+deep-translator
