@@ -32,7 +32,7 @@ embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 genai.configure(api_key=GOOGLE_API_KEY)
-_vision_model = genai.GenerativeModel("gemini-2.0-flash")
+_vision_model = genai.GenerativeModel("gemini-2.5-flash-lite")
 
 
 # Hash helpers (deduplication)

@@ -161,12 +161,12 @@ GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 genai.configure(api_key=GOOGLE_API_KEY)
 
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash-lite",
     google_api_key=GOOGLE_API_KEY,
     temperature=0.1,
 )
 
-vision_model = genai.GenerativeModel("gemini-2.0-flash")
+vision_model = genai.GenerativeModel("gemini-2.5-flash-lite")
 
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 vectordb_file_path = r"c:\customer_service_chatbot_LLM\src\faiss_index"

@@ -363,7 +363,7 @@ def get_medical_response(
     from langchain_google_genai import ChatGoogleGenerativeAI
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash-lite",
         google_api_key=GOOGLE_API_KEY,
         temperature=0.1,
     )
