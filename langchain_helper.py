@@ -421,6 +421,21 @@ def classify_message(question: str, conversation_history: list, has_image: bool 
             "intensity": "low", "escalate": False, "sentiment_reason": "Too short to classify.",
         }
 
+    # Fast path: greetings / small talk are never ambiguous, and don't need an
+    # LLM call to classify — saves quota and avoids the model inventing two
+    # "interpretations" of what is just a hello.
+    GREETING_PATTERN = re.compile(
+        r"^\s*(hi+|hey+|hello+|yo+|sup|greetings|good\s*(morning|afternoon|evening|day))"
+        r"\s*(there|chatbot|bot|assistant|team|everyone)?\s*[!.?]*\s*$",
+        re.IGNORECASE,
+    )
+    if GREETING_PATTERN.match(question.strip()):
+        return {
+            "is_ambiguous": False, "clarifications": [], "ambiguity_reason": "Greeting — no clarification needed.",
+            "sentiment": "positive", "sentiment_score": 0.3, "emotion": "happy",
+            "intensity": "low", "escalate": False, "sentiment_reason": "Friendly greeting.",
+        }
+
     history_snippet = ""
     for msg in conversation_history[-4:]:
         role = "Customer" if msg["role"] == "user" else "Assistant"
@@ -442,6 +457,9 @@ in a single pass:
    clarifications ["Are you simply greeting me?", "Are you asking if I am saying hello?"]
    — these are the same interpretation reworded twice, not two distinct ones. Correct
    answer for that question is is_ambiguous=false.
+   Greetings and small talk directed at the assistant (e.g. "hello chatbot", "hi there",
+   "good morning") are NEVER ambiguous, no matter how you phrase potential interpretations
+   of them — always mark is_ambiguous=false for these.
 
 2) SENTIMENT — Classify the emotional tone of the CUSTOMER'S latest message. Use the recent
    conversation only as context; do not classify the assistant's tone.
