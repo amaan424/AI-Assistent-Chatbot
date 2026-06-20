@@ -185,7 +185,7 @@ def render_medical_message(msg: dict):
 
 # Send handlers
 
-def handle_send(question: str, uploaded_image=None):
+def handle_send(question: str, uploaded_image=None, is_clarification_reply: bool = False):
     """Customer service pipeline."""
     if not question.strip():
         return
@@ -206,6 +206,7 @@ def handle_send(question: str, uploaded_image=None):
             question=question,
             conversation_history=st.session_state.chat_history[:-1],
             image_bytes=image_bytes,
+            skip_ambiguity=is_clarification_reply,
         )
 
     if result.get("is_ambiguous"):
@@ -334,7 +335,7 @@ with tab_cs:
             for i, clarification in enumerate(st.session_state.pending_clarifications):
                 with cols[i]:
                     if st.button(clarification, key=f"clarify_{i}"):
-                        handle_send(clarification)
+                        handle_send(clarification, is_clarification_reply=True)
                         st.rerun()
 
         st.markdown("**📎 Attach an image (optional):**")
@@ -352,7 +353,8 @@ with tab_cs:
             key="cs_chat_input",
         )
         if question:
-            handle_send(question, uploaded_image=uploaded_image)
+            was_pending_clarification = bool(st.session_state.pending_clarifications)
+            handle_send(question, uploaded_image=uploaded_image, is_clarification_reply=was_pending_clarification)
             st.rerun()
 
         if st.button("🗑️ Clear Chat", key="cs_clear"):

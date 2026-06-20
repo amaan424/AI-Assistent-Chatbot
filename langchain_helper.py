@@ -398,7 +398,7 @@ Guidance:
 
 # 3C. Combined classifier — ambiguity + sentiment in a single Gemini call
 
-def classify_message(question: str, conversation_history: list, has_image: bool = False) -> dict:
+def classify_message(question: str, conversation_history: list, has_image: bool = False, skip_ambiguity: bool = False) -> dict:
     """
     Runs ambiguity detection AND sentiment analysis in a single Gemini call.
 
@@ -506,6 +506,17 @@ Guidance:
         result.setdefault("intensity", "low")
         result.setdefault("escalate", False)
         result["sentiment_score"] = float(result["sentiment_score"])
+
+        # Hard override: if this message is itself the user's reply to a clarification
+        # we just asked (e.g. they clicked one of our own suggested clarification
+        # buttons), never flag it ambiguous again — otherwise the bot can loop forever
+        # asking the user to clarify their own clarification.
+        if skip_ambiguity:
+            if result["is_ambiguous"]:
+                logger.info("🛡️ Skipping ambiguity flag — this is a reply to a prior clarification prompt")
+            result["is_ambiguous"] = False
+            result["clarifications"] = []
+            result["ambiguity_reason"] = "Skipped: reply to a previous clarification prompt."
 
         # Safety net: override false-positive ambiguity flags where the model's
         # two "clarifications" are just paraphrases of each other rather than
@@ -693,6 +704,7 @@ def get_multimodal_response(
     question: str,
     conversation_history: list,
     image_bytes: Optional[bytes] = None,
+    skip_ambiguity: bool = False,
 ) -> dict:
     """
     Full pipeline:
@@ -733,7 +745,7 @@ def get_multimodal_response(
 
     # Step 1: Combined ambiguity + sentiment classification
     logger.info("🔄 Step 1/8 — Combined ambiguity + sentiment classification")
-    classification = classify_message(classification_input, conversation_history, has_image=has_image)
+    classification = classify_message(classification_input, conversation_history, has_image=has_image, skip_ambiguity=skip_ambiguity)
     sentiment = {
         "sentiment": classification.get("sentiment", "neutral"),
         "sentiment_score": classification.get("sentiment_score", 0.0),
