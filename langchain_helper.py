@@ -435,7 +435,13 @@ in a single pass:
    Do NOT mark it ambiguous just because it's a complaint/vent without a specific question
    (e.g. "this is ridiculous, nothing works" — that's a request for help, not ambiguity), or
    because it's vague but only has ONE reasonable reading in context. Only flag
-   is_ambiguous=true when you can articulate 2+ clearly distinct interpretations.
+   is_ambiguous=true when the 2+ interpretations would lead to DIFFERENT knowledge-base
+   lookups or DIFFERENT answers. If your two "clarifications" are just two ways of phrasing
+   the same underlying question, they are NOT distinct — mark is_ambiguous=false.
+   BAD example (do not do this): question "Are you just saying hello?" →
+   clarifications ["Are you simply greeting me?", "Are you asking if I am saying hello?"]
+   — these are the same interpretation reworded twice, not two distinct ones. Correct
+   answer for that question is is_ambiguous=false.
 
 2) SENTIMENT — Classify the emotional tone of the CUSTOMER'S latest message. Use the recent
    conversation only as context; do not classify the assistant's tone.
@@ -482,6 +488,20 @@ Guidance:
         result.setdefault("intensity", "low")
         result.setdefault("escalate", False)
         result["sentiment_score"] = float(result["sentiment_score"])
+
+        # Safety net: override false-positive ambiguity flags where the model's
+        # two "clarifications" are just paraphrases of each other rather than
+        # genuinely distinct interpretations (common failure mode on small models).
+        if result["is_ambiguous"] and len(result["clarifications"]) >= 2:
+            words_a = set(re.findall(r"\w+", result["clarifications"][0].lower()))
+            words_b = set(re.findall(r"\w+", result["clarifications"][1].lower()))
+            if words_a and words_b:
+                overlap = len(words_a & words_b) / max(len(words_a), len(words_b))
+                if overlap > 0.6:
+                    logger.info(f"🛡️ Overriding false-positive ambiguity (word overlap={overlap:.2f})")
+                    result["is_ambiguous"] = False
+                    result["clarifications"] = []
+                    result["ambiguity_reason"] = "Overridden: clarifications were near-duplicates."
 
         logger.info(
             f"🔍 Classify — ambiguous={result['is_ambiguous']}, "
