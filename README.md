@@ -170,7 +170,3 @@ This project uses the following third-party datasets:
 - **arXiv Metadata** — Creative Commons CC0
 
 The source code is available for educational and reference purposes.
-
-## Contact
-
-For queries regarding the internship: **training@elevanceskills.com**
