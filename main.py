@@ -599,7 +599,8 @@ with tab_kb:
 
         medquad_dir = st.text_input(
             "MedQuAD dataset directory:",
-            value=r"c:\customer_service_chatbot_LLM\src\MedQuAD",
+            value="",
+            placeholder="e.g. /home/user/MedQuAD  or  C:\\data\\MedQuAD",
             key="medquad_dir",
         )
         max_files_input = st.number_input(
@@ -656,7 +657,8 @@ with tab_kb:
 
         arxiv_json_path = st.text_input(
             "Path to arxiv-metadata-oai-snapshot.json:",
-            value=r"c:\customer_service_chatbot_LLM\src\arxiv-metadata-oai-snapshot.json",
+            value="",
+            placeholder="e.g. /home/user/arxiv-metadata-oai-snapshot.json",
             key="arxiv_json_path",
         )
         max_papers_input = st.number_input(

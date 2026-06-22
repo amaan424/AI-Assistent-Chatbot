@@ -17,16 +17,19 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from dotenv import load_dotenv
 
-load_dotenv(r"c:\customer_service_chatbot_LLM\.env")
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-# Paths
+# Paths — relative to this file's location, so the same code works on
+# Windows (local dev) and Streamlit Cloud's Linux containers, regardless
+# of which OS or working directory the app is launched from.
 
-VECTORDB_PATH    = r"c:\customer_service_chatbot_LLM\src\faiss_index"
-CSV_PATH         = r"c:\customer_service_chatbot_LLM\src\dataset.csv"
-SEEN_HASHES_PATH = r"c:\customer_service_chatbot_LLM\src\seen_hashes.json"
+VECTORDB_PATH    = str(BASE_DIR / "faiss_index")
+CSV_PATH         = str(BASE_DIR / "dataset.csv")
+SEEN_HASHES_PATH = str(BASE_DIR / "seen_hashes.json")
 
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 

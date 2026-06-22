@@ -19,7 +19,8 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 
-load_dotenv(r"c:\customer_service_chatbot_LLM\.env")
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -169,7 +170,7 @@ llm = ChatGoogleGenerativeAI(
 vision_model = genai.GenerativeModel("gemini-2.5-flash-lite")
 
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-vectordb_file_path = r"c:\customer_service_chatbot_LLM\src\faiss_index"
+vectordb_file_path = str(BASE_DIR / "faiss_index")
 
 
 # Retry helper — absorbs transient Gemini rate-limit / quota / timeout errors

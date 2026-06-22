@@ -13,16 +13,21 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 
-load_dotenv(r"c:\customer_service_chatbot_LLM\.env")
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-# Paths
+# Paths — relative to this file, portable across Windows/local and
+# Streamlit Cloud/Linux deployments.
 
-ARXIV_FAISS_PATH  = r"c:\customer_service_chatbot_LLM\src\arxiv_faiss_index"
-ARXIV_META_PATH   = r"c:\customer_service_chatbot_LLM\src\arxiv_meta.json"
-ARXIV_JSON_PATH   = r"c:\customer_service_chatbot_LLM\src\arxiv-metadata-oai-snapshot.json"
+ARXIV_FAISS_PATH  = str(BASE_DIR / "arxiv_faiss_index")
+ARXIV_META_PATH   = str(BASE_DIR / "arxiv_meta.json")
+# The raw arXiv JSON is too large for GitHub — it must be placed alongside
+# these source files before building the index.  The default below is just
+# the expected filename; the Knowledge Base Manager UI lets users override it.
+ARXIV_JSON_PATH   = str(BASE_DIR / "arxiv-metadata-oai-snapshot.json")
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 genai.configure(api_key=GOOGLE_API_KEY)

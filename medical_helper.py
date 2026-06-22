@@ -14,16 +14,18 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 
-load_dotenv(r"c:\customer_service_chatbot_LLM\.env")
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-# Paths
+# Paths — relative to this file, portable across Windows/local and
+# Streamlit Cloud/Linux deployments.
 
-MEDICAL_FAISS_PATH  = r"c:\customer_service_chatbot_LLM\src\medical_faiss_index"
-MEDQUAD_DATASET_DIR = r"c:\customer_service_chatbot_LLM\src\MedQuAD"
-MEDICAL_META_PATH   = r"c:\customer_service_chatbot_LLM\src\medical_meta.json"
+MEDICAL_FAISS_PATH  = str(BASE_DIR / "medical_faiss_index")
+MEDQUAD_DATASET_DIR = str(BASE_DIR / "MedQuAD")
+MEDICAL_META_PATH   = str(BASE_DIR / "medical_meta.json")
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 genai.configure(api_key=GOOGLE_API_KEY)
